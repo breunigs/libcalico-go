@@ -321,6 +321,8 @@ func (c *networkPolicyClient) Watch(ctx context.Context, list model.ListInterfac
 
 	// If a revision is specified, see if it contains a "/" and if so split into separate
 	// revisions for the CRD and for the K8s resource.
+
+	log.Infof("stefan: creating watch, was given this revision: %s", revision)
 	crdNPRev, k8sNPRev, err := c.SplitNetworkPolicyRevision(revision)
 	if err != nil {
 		return nil, err

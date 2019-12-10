@@ -101,11 +101,14 @@ mainLoop:
 			wc.logger.WithField("RC", wc.watch.ResultChan()).Debug("Reading event from results channel")
 
 			// Handle the specific event type.
+			wc.logger.Infof("stefan: event type: %+v", event.Type)
 			switch event.Type {
 			case api.WatchAdded, api.WatchModified:
 				kvp := event.New
+				wc.logger.Infof("stefan: watch added or modified: kvp: %+v", kvp)
 				wc.handleWatchListEvent(kvp)
 			case api.WatchDeleted:
+				wc.logger.Infof("stefan: watch deleted")
 				// Nil out the value to indicate a delete.
 				kvp := event.Old
 				if kvp == nil {
@@ -220,6 +223,7 @@ func (wc *watcherCache) resyncAndCreateWatcher(ctx context.Context) {
 
 			// Send updates for each of the resources we listed - this will revalidate entries in
 			// the oldResources map.
+			wc.logger.Infof("stefan: kv pairs from full sync")
 			for _, kvp := range l.KVPairs {
 				wc.handleWatchListEvent(kvp)
 			}
@@ -230,6 +234,7 @@ func (wc *watcherCache) resyncAndCreateWatcher(ctx context.Context) {
 			wc.finishResync()
 
 			// Store the current watch revision.  This gets updated on any new add/modified event.
+			wc.logger.Infof("stefan: setting %s\n(%+v)", l.Revision, l)
 			wc.currentWatchRevision = l.Revision
 		}
 
@@ -317,6 +322,7 @@ func (wc *watcherCache) finishResync() {
 // handleConvertedWatchEvent to send the appropriate update types.
 func (wc *watcherCache) handleWatchListEvent(kvp *model.KVPair) {
 	// Track the resource version from this watch/list event.
+	wc.logger.Infof("stefan: setting %s\n(%+v)", kvp.Revision, kvp)
 	wc.currentWatchRevision = kvp.Revision
 
 	if wc.resourceType.UpdateProcessor == nil {

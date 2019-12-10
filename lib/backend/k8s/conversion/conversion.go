@@ -429,7 +429,7 @@ func (c Converter) K8sNetworkPolicyToCalico(np *networkingv1.NetworkPolicy) (*mo
 	}
 
 	// Build and return the KVPair.
-	return &model.KVPair{
+	kvp := &model.KVPair{
 		Key: model.ResourceKey{
 			Name:      policyName,
 			Namespace: np.Namespace,
@@ -437,7 +437,12 @@ func (c Converter) K8sNetworkPolicyToCalico(np *networkingv1.NetworkPolicy) (*mo
 		},
 		Value:    policy,
 		Revision: np.ResourceVersion,
-	}, nil
+	}
+
+	log.Infof("stefan: converting k8s to calico crd yielded: %+v", kvp)
+	log.Infof("stefan: could instead have this revision thingy: %s", c.JoinNetworkPolicyRevisions("", np.ResourceVersion))
+
+	return kvp, nil
 }
 
 // k8sSelectorToCalico takes a namespaced k8s label selector and returns the Calico
